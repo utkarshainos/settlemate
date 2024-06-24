@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Split Payment</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -13,64 +17,13 @@
       .container {
         max-width: 800px;
         margin: auto;
-        background: white;
-        padding: 20px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
       }
-      h2 {
-        text-align: center;
+      .card {
+        margin-bottom: 20px;
       }
-      .form-group {
-        margin-bottom: 15px;
-      }
-      .form-group label {
-        display: block;
-        margin-bottom: 5px;
-      }
-      .form-group input,
-      .form-group select {
-        width: 100%;
-        padding: 8px;
-        box-sizing: border-box;
-      }
-      .button-group {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-      }
-      button {
-        padding: 10px;
-        border: none;
-        cursor: pointer;
-        font-size: 16px;
-      }
-      .add-button {
-        background: #28a745;
-        color: white;
-      }
-      .add-button:hover {
-        background: #218838;
-      }
-      .calculate-button {
-        background: #007bff;
-        color: white;
-      }
-      .calculate-button:hover {
-        background: #0069d9;
-      }
-      .result {
-        margin-top: 20px;
-      }
-      .entry {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-      }
-      .edit-group {
-        display: flex;
-        align-items: center;
-        gap: 5px;
+      .section-title {
+        font-weight: bold;
+        color: #007bff;
       }
       .edit-icon,
       .delete-icon {
@@ -86,60 +39,63 @@
       .hidden {
         display: none;
       }
-      .section {
-        margin-bottom: 20px;
-      }
-      .section-title {
-        margin-bottom: 10px;
-        font-weight: bold;
-      }
     </style>
   </head>
   <body>
     <div class="container">
-      <h2>Split Payment</h2>
+      <h2 class="text-center mb-4">Split Payment</h2>
 
-      <div class="section">
-        <div class="section-title">Add Participant</div>
-        <div class="form-group">
-          <label for="participant">Participant Name</label>
-          <input type="text" id="participant" />
+      <div class="card">
+        <div class="card-header section-title">Add Participant</div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="participant">Participant Name</label>
+            <input type="text" class="form-control" id="participant" />
+          </div>
+          <button class="btn btn-success" onclick="addParticipant()">
+            Add Participant
+          </button>
+          <div id="participants-list" class="mt-3"></div>
         </div>
-        <button class="add-button" onclick="addParticipant()">
-          Add Participant
-        </button>
-        <div id="participants-list" class="participants-list"></div>
       </div>
 
-      <div class="section">
-        <div class="section-title">Add Payment</div>
-        <div class="form-group">
-          <label for="payment-type">Type of Payment</label>
-          <input type="text" id="payment-type" />
+      <div class="card">
+        <div class="card-header section-title">Add Payment</div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="payment-type">Paid For</label>
+            <input type="text" class="form-control" id="payment-type" />
+          </div>
+          <div class="form-group">
+            <label for="payment-amount">Amount</label>
+            <input type="number" class="form-control" id="payment-amount" />
+          </div>
+          <div class="form-group">
+            <label for="payer">Paid by</label>
+            <select class="form-control" id="payer"></select>
+          </div>
+          <div id="participants-checkboxes" class="form-group"></div>
+          <button class="btn btn-success" onclick="addPayment()">
+            Add Payment
+          </button>
         </div>
-        <div class="form-group">
-          <label for="payment-amount">Amount Paid</label>
-          <input type="number" id="payment-amount" />
-        </div>
-        <div class="form-group">
-          <label for="payer">Who Paid</label>
-          <select id="payer"></select>
-        </div>
-        <div id="participants-checkboxes"></div>
-        <button class="add-button" onclick="addPayment()">Add Payment</button>
       </div>
 
-      <div class="section">
-        <div class="section-title">Payments</div>
-        <div class="result" id="payments-result"></div>
+      <div class="card">
+        <div class="card-header section-title">Payments</div>
+        <div class="card-body">
+          <div id="payments-result"></div>
+        </div>
       </div>
 
-      <div class="section">
-        <div class="section-title">Balances</div>
-        <button class="calculate-button" onclick="calculateBalance()">
-          Calculate Balance
-        </button>
-        <div class="result" id="balance-result"></div>
+      <div class="card">
+        <div class="card-header section-title">Balances</div>
+        <div class="card-body">
+          <button class="btn btn-primary mb-3" onclick="calculateBalance()">
+            Calculate Balance
+          </button>
+          <div id="balance-result"></div>
+        </div>
       </div>
     </div>
 
@@ -167,7 +123,7 @@
 
       function displayParticipants() {
         const participantsList = document.getElementById("participants-list");
-        participantsList.innerHTML = "<h3>Participants:</h3>";
+        participantsList.innerHTML = "<h5>Participants:</h5>";
         participants.forEach((participant, index) => {
           participantsList.innerHTML += `<p>${
             index + 1
@@ -179,7 +135,7 @@
         const participantsCheckboxes = document.getElementById(
           "participants-checkboxes"
         );
-        participantsCheckboxes.innerHTML = "<h3>Select Participants:</h3>";
+        participantsCheckboxes.innerHTML = "<h5>Select Participants:</h5>";
         participants.forEach((participant, index) => {
           participantsCheckboxes.innerHTML += `<label><input type="checkbox" value="${index}" checked /> ${participant}</label><br/>`;
         });
@@ -235,7 +191,7 @@
 
       function displayPayments() {
         const paymentsResultDiv = document.getElementById("payments-result");
-        paymentsResultDiv.innerHTML = "<h3>Payments:</h3>";
+        paymentsResultDiv.innerHTML = "<h5>Payments:</h5>";
         payments.forEach((payment, index) => {
           const participantNames = payment.selectedParticipants
             .map((i) => participants[i])
@@ -244,12 +200,12 @@
             participants[payment.payer]
           } paid for ${payment.paymentType}: ₹${payment.paymentAmount.toFixed(
             2
-          )} - [${participantNames}]</p><span class="edit-icon" onclick="showEditField(${index})">✏️</span></div>
+          )} - [${participantNames}] <span class="edit-icon" onclick="showEditField(${index})">✏️</span></p></div>
                                   <div class="edit-group hidden" id="edit-group-${index}">
-                                    <input type="number" id="edit-amount-${index}" value="${
+                                    <input type="number" class="form-control mb-2" id="edit-amount-${index}" value="${
             payment.paymentAmount
           }" />
-                                    <select id="edit-payer-${index}">${participants
+                                    <select class="form-control mb-2" id="edit-payer-${index}">${participants
             .map(
               (p, i) =>
                 `<option value="${i}" ${
@@ -257,8 +213,8 @@
                 }>${p}</option>`
             )
             .join("")}</select>
-                                    <div id="edit-participants-checkboxes-${index}"></div>
-                                    <button onclick="saveEdit(${index})">Save</button>
+                                    <div id="edit-participants-checkboxes-${index}" class="form-group"></div>
+                                    <button class="btn btn-success" onclick="saveEdit(${index})">Save</button>
                                   </div>`;
           displayEditParticipantCheckboxes(index, payment.selectedParticipants);
         });
@@ -268,7 +224,7 @@
         const editParticipantsCheckboxes = document.getElementById(
           `edit-participants-checkboxes-${index}`
         );
-        editParticipantsCheckboxes.innerHTML = "<h4>Edit Participants:</h4>";
+        editParticipantsCheckboxes.innerHTML = "<h5>Edit Participants:</h5>";
         participants.forEach((participant, i) => {
           editParticipantsCheckboxes.innerHTML += `<label><input type="checkbox" value="${i}" ${
             selectedParticipants.includes(i) ? "checked" : ""
@@ -344,7 +300,7 @@
           }
         });
 
-        balanceResultDiv.innerHTML += "<h3>Payments:</h3>";
+        balanceResultDiv.innerHTML += "<h5>Payments:</h5>";
         positiveBalances.forEach((p) => {
           negativeBalances.forEach((n) => {
             if (n.balance < 0) {
