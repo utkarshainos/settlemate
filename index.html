@@ -11,7 +11,7 @@
         padding: 20px;
       }
       .container {
-        max-width: 600px;
+        max-width: 800px;
         margin: auto;
         background: white;
         padding: 20px;
@@ -27,7 +27,8 @@
         display: block;
         margin-bottom: 5px;
       }
-      .form-group input {
+      .form-group input,
+      .form-group select {
         width: 100%;
         padding: 8px;
         box-sizing: border-box;
@@ -71,67 +72,207 @@
         align-items: center;
         gap: 5px;
       }
-      .edit-icon {
+      .edit-icon,
+      .delete-icon {
         cursor: pointer;
-        color: blue;
         margin-left: 10px;
+      }
+      .edit-icon {
+        color: blue;
+      }
+      .delete-icon {
+        color: red;
       }
       .hidden {
         display: none;
+      }
+      .section {
+        margin-bottom: 20px;
+      }
+      .section-title {
+        margin-bottom: 10px;
+        font-weight: bold;
       }
     </style>
   </head>
   <body>
     <div class="container">
       <h2>Split Payment</h2>
-      <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" id="name" />
+
+      <div class="section">
+        <div class="section-title">Add Participant</div>
+        <div class="form-group">
+          <label for="participant">Participant Name</label>
+          <input type="text" id="participant" />
+        </div>
+        <button class="add-button" onclick="addParticipant()">
+          Add Participant
+        </button>
+        <div id="participants-list" class="participants-list"></div>
       </div>
-      <div class="form-group">
-        <label for="amount">Amount Paid</label>
-        <input type="number" id="amount" />
+
+      <div class="section">
+        <div class="section-title">Add Payment</div>
+        <div class="form-group">
+          <label for="payment-type">Type of Payment</label>
+          <input type="text" id="payment-type" />
+        </div>
+        <div class="form-group">
+          <label for="payment-amount">Amount Paid</label>
+          <input type="number" id="payment-amount" />
+        </div>
+        <div class="form-group">
+          <label for="payer">Who Paid</label>
+          <select id="payer"></select>
+        </div>
+        <div id="participants-checkboxes"></div>
+        <button class="add-button" onclick="addPayment()">Add Payment</button>
       </div>
-      <div class="button-group">
-        <button class="add-button" onclick="addEntry()">Add Entry</button>
+
+      <div class="section">
+        <div class="section-title">Payments</div>
+        <div class="result" id="payments-result"></div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Balances</div>
         <button class="calculate-button" onclick="calculateBalance()">
           Calculate Balance
         </button>
+        <div class="result" id="balance-result"></div>
       </div>
-      <div class="result" id="result"></div>
     </div>
 
     <script>
-      const entries = [];
+      const participants = [];
+      const payments = [];
 
-      function addEntry() {
-        const name = document.getElementById("name").value;
-        const amount = parseFloat(document.getElementById("amount").value);
-
-        if (name && amount) {
-          entries.push({ name, amount });
-          document.getElementById("name").value = "";
-          document.getElementById("amount").value = "";
-          displayEntries();
+      function addParticipant() {
+        const participant = document.getElementById("participant").value;
+        if (participant) {
+          participants.push(participant);
+          document.getElementById("participant").value = "";
+          displayParticipants();
+          displayParticipantCheckboxes();
+          displayPayerDropdown();
         }
       }
 
-      function displayEntries() {
-        const resultDiv = document.getElementById("result");
-        resultDiv.innerHTML = "<h3>Entries:</h3>";
-        entries.forEach((entry, index) => {
-          resultDiv.innerHTML += `<div class="entry">
-                                    <p>${entry.name}: ₹${entry.amount.toFixed(
+      function deleteParticipant(index) {
+        participants.splice(index, 1);
+        displayParticipants();
+        displayParticipantCheckboxes();
+        displayPayerDropdown();
+      }
+
+      function displayParticipants() {
+        const participantsList = document.getElementById("participants-list");
+        participantsList.innerHTML = "<h3>Participants:</h3>";
+        participants.forEach((participant, index) => {
+          participantsList.innerHTML += `<p>${
+            index + 1
+          }. ${participant} <span class="delete-icon" onclick="deleteParticipant(${index})">🗑️</span></p>`;
+        });
+      }
+
+      function displayParticipantCheckboxes() {
+        const participantsCheckboxes = document.getElementById(
+          "participants-checkboxes"
+        );
+        participantsCheckboxes.innerHTML = "<h3>Select Participants:</h3>";
+        participants.forEach((participant, index) => {
+          participantsCheckboxes.innerHTML += `<label><input type="checkbox" value="${index}" checked /> ${participant}</label><br/>`;
+        });
+      }
+
+      function displayPayerDropdown() {
+        const payerDropdown = document.getElementById("payer");
+        payerDropdown.innerHTML = "";
+        participants.forEach((participant, index) => {
+          payerDropdown.innerHTML += `<option value="${index}">${participant}</option>`;
+        });
+      }
+
+      function addPayment() {
+        const paymentType = document.getElementById("payment-type").value;
+        const paymentAmount = parseFloat(
+          document.getElementById("payment-amount").value
+        );
+        const payer = parseInt(document.getElementById("payer").value);
+        const selectedParticipants = Array.from(
+          document.querySelectorAll(
+            '#participants-checkboxes input[type="checkbox"]:checked'
+          )
+        ).map((cb) => parseInt(cb.value));
+
+        if (
+          paymentType &&
+          paymentAmount &&
+          !isNaN(payer) &&
+          selectedParticipants.length > 0
+        ) {
+          payments.push({
+            paymentType,
+            paymentAmount,
+            payer,
+            selectedParticipants,
+          });
+          document.getElementById("payment-type").value = "";
+          document.getElementById("payment-amount").value = "";
+          displayPayments();
+          resetCheckboxes();
+        }
+      }
+
+      function resetCheckboxes() {
+        const checkboxes = document.querySelectorAll(
+          '#participants-checkboxes input[type="checkbox"]'
+        );
+        checkboxes.forEach((checkbox) => {
+          checkbox.checked = true;
+        });
+      }
+
+      function displayPayments() {
+        const paymentsResultDiv = document.getElementById("payments-result");
+        paymentsResultDiv.innerHTML = "<h3>Payments:</h3>";
+        payments.forEach((payment, index) => {
+          const participantNames = payment.selectedParticipants
+            .map((i) => participants[i])
+            .join(", ");
+          paymentsResultDiv.innerHTML += `<div class="entry"><p>${
+            participants[payment.payer]
+          } paid for ${payment.paymentType}: ₹${payment.paymentAmount.toFixed(
             2
-          )}</p>
-                                    <span class="edit-icon" onclick="showEditField(${index})">✏️</span>
-                                  </div>
+          )} - [${participantNames}]</p><span class="edit-icon" onclick="showEditField(${index})">✏️</span></div>
                                   <div class="edit-group hidden" id="edit-group-${index}">
                                     <input type="number" id="edit-amount-${index}" value="${
-            entry.amount
+            payment.paymentAmount
           }" />
+                                    <select id="edit-payer-${index}">${participants
+            .map(
+              (p, i) =>
+                `<option value="${i}" ${
+                  payment.payer === i ? "selected" : ""
+                }>${p}</option>`
+            )
+            .join("")}</select>
+                                    <div id="edit-participants-checkboxes-${index}"></div>
                                     <button onclick="saveEdit(${index})">Save</button>
                                   </div>`;
+          displayEditParticipantCheckboxes(index, payment.selectedParticipants);
+        });
+      }
+
+      function displayEditParticipantCheckboxes(index, selectedParticipants) {
+        const editParticipantsCheckboxes = document.getElementById(
+          `edit-participants-checkboxes-${index}`
+        );
+        editParticipantsCheckboxes.innerHTML = "<h4>Edit Participants:</h4>";
+        participants.forEach((participant, i) => {
+          editParticipantsCheckboxes.innerHTML += `<label><input type="checkbox" value="${i}" ${
+            selectedParticipants.includes(i) ? "checked" : ""
+          } /> ${participant}</label><br/>`;
         });
       }
 
@@ -145,44 +286,70 @@
         const newAmount = parseFloat(
           document.getElementById(`edit-amount-${index}`).value
         );
-        if (!isNaN(newAmount)) {
-          entries[index].amount = newAmount;
-          displayEntries();
+        const payer = parseInt(
+          document.getElementById(`edit-payer-${index}`).value
+        );
+        const selectedParticipants = Array.from(
+          document.querySelectorAll(
+            `#edit-group-${index} input[type="checkbox"]:checked`
+          )
+        ).map((cb) => parseInt(cb.value));
+
+        if (
+          !isNaN(newAmount) &&
+          selectedParticipants.length > 0 &&
+          !isNaN(payer)
+        ) {
+          payments[index].paymentAmount = newAmount;
+          payments[index].payer = payer;
+          payments[index].selectedParticipants = selectedParticipants;
+          displayPayments();
         }
       }
 
       function calculateBalance() {
-        const totalAmount = entries.reduce(
-          (sum, entry) => sum + entry.amount,
-          0
-        );
-        const averageAmount = totalAmount / entries.length;
-        const balances = entries.map((entry) => ({
-          name: entry.name,
-          balance: entry.amount - averageAmount,
-        }));
+        const balances = participants.map(() => 0);
 
-        displayBalances(balances);
-      }
-
-      function displayBalances(balances) {
-        const resultDiv = document.getElementById("result");
-        resultDiv.innerHTML += "<h3>Balances:</h3>";
-        balances.forEach((balance) => {
-          resultDiv.innerHTML += `<p>${
-            balance.name
-          }: ₹${balance.balance.toFixed(2)}</p>`;
+        payments.forEach((payment) => {
+          const amountPerPerson =
+            payment.paymentAmount / payment.selectedParticipants.length;
+          payment.selectedParticipants.forEach((index) => {
+            balances[index] -= amountPerPerson;
+          });
+          balances[payment.payer] += payment.paymentAmount;
         });
 
-        const positiveBalances = balances.filter((b) => b.balance > 0);
-        const negativeBalances = balances.filter((b) => b.balance < 0);
+        const balanceResultDiv = document.getElementById("balance-result");
+        balanceResultDiv.innerHTML = "";
+        participants.forEach((participant, index) => {
+          balanceResultDiv.innerHTML += `<p>${participant}: ₹${balances[
+            index
+          ].toFixed(2)}</p>`;
+        });
 
-        resultDiv.innerHTML += "<h3>Payments:</h3>";
+        const positiveBalances = [];
+        const negativeBalances = [];
+
+        participants.forEach((participant, index) => {
+          if (balances[index] > 0) {
+            positiveBalances.push({
+              name: participant,
+              balance: balances[index],
+            });
+          } else if (balances[index] < 0) {
+            negativeBalances.push({
+              name: participant,
+              balance: balances[index],
+            });
+          }
+        });
+
+        balanceResultDiv.innerHTML += "<h3>Payments:</h3>";
         positiveBalances.forEach((p) => {
           negativeBalances.forEach((n) => {
             if (n.balance < 0) {
               const payment = Math.min(p.balance, -n.balance);
-              resultDiv.innerHTML += `<p>${n.name} pays ${
+              balanceResultDiv.innerHTML += `<p>${n.name} owes ${
                 p.name
               } ₹${payment.toFixed(2)}</p>`;
               p.balance -= payment;
