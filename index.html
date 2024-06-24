@@ -32,23 +32,52 @@
         padding: 8px;
         box-sizing: border-box;
       }
+      .button-group {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
       button {
-        display: block;
-        width: 100%;
         padding: 10px;
-        background: #036838;
-        color: white;
         border: none;
         cursor: pointer;
+        font-size: 16px;
       }
-      button:hover {
-        background: #025c2d;
+      .add-button {
+        background: #28a745;
+        color: white;
+      }
+      .add-button:hover {
+        background: #218838;
+      }
+      .calculate-button {
+        background: #007bff;
+        color: white;
+      }
+      .calculate-button:hover {
+        background: #0069d9;
       }
       .result {
         margin-top: 20px;
       }
       .entry {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+      }
+      .edit-group {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .edit-icon {
         cursor: pointer;
+        color: blue;
+        margin-left: 10px;
+      }
+      .hidden {
+        display: none;
       }
     </style>
   </head>
@@ -63,8 +92,12 @@
         <label for="amount">Amount Paid</label>
         <input type="number" id="amount" />
       </div>
-      <button onclick="addEntry()">Add Entry</button>
-      <button onclick="calculateBalance()">Calculate Balance</button>
+      <div class="button-group">
+        <button class="add-button" onclick="addEntry()">Add Entry</button>
+        <button class="calculate-button" onclick="calculateBalance()">
+          Calculate Balance
+        </button>
+      </div>
       <div class="result" id="result"></div>
     </div>
 
@@ -87,19 +120,33 @@
         const resultDiv = document.getElementById("result");
         resultDiv.innerHTML = "<h3>Entries:</h3>";
         entries.forEach((entry, index) => {
-          resultDiv.innerHTML += `<p class="entry" onclick="editEntry(${index})">${
-            entry.name
-          }: ₹${entry.amount.toFixed(2)}</p>`;
+          resultDiv.innerHTML += `<div class="entry">
+                                    <p>${entry.name}: ₹${entry.amount.toFixed(
+            2
+          )}</p>
+                                    <span class="edit-icon" onclick="showEditField(${index})">✏️</span>
+                                  </div>
+                                  <div class="edit-group hidden" id="edit-group-${index}">
+                                    <input type="number" id="edit-amount-${index}" value="${
+            entry.amount
+          }" />
+                                    <button onclick="saveEdit(${index})">Save</button>
+                                  </div>`;
         });
       }
 
-      function editEntry(index) {
-        const newAmount = prompt(
-          `Enter new amount for ${entries[index].name}:`,
-          entries[index].amount
+      function showEditField(index) {
+        document
+          .getElementById(`edit-group-${index}`)
+          .classList.toggle("hidden");
+      }
+
+      function saveEdit(index) {
+        const newAmount = parseFloat(
+          document.getElementById(`edit-amount-${index}`).value
         );
-        if (newAmount !== null && !isNaN(parseFloat(newAmount))) {
-          entries[index].amount = parseFloat(newAmount);
+        if (!isNaN(newAmount)) {
+          entries[index].amount = newAmount;
           displayEntries();
         }
       }
