@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Split Payment</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #f4f4f4;
+        padding: 20px;
+      }
+      .container {
+        max-width: 600px;
+        margin: auto;
+        background: white;
+        padding: 20px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        text-align: center;
+      }
+      .form-group {
+        margin-bottom: 15px;
+      }
+      .form-group label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      .form-group input {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+      }
+      button {
+        display: block;
+        width: 100%;
+        padding: 10px;
+        background: #036838;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #025c2d;
+      }
+      .result {
+        margin-top: 20px;
+      }
+      .entry {
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h2>Split Payment</h2>
+      <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" id="name" />
+      </div>
+      <div class="form-group">
+        <label for="amount">Amount Paid</label>
+        <input type="number" id="amount" />
+      </div>
+      <button onclick="addEntry()">Add Entry</button>
+      <button onclick="calculateBalance()">Calculate Balance</button>
+      <div class="result" id="result"></div>
+    </div>
+
+    <script>
+      const entries = [];
+
+      function addEntry() {
+        const name = document.getElementById("name").value;
+        const amount = parseFloat(document.getElementById("amount").value);
+
+        if (name && amount) {
+          entries.push({ name, amount });
+          document.getElementById("name").value = "";
+          document.getElementById("amount").value = "";
+          displayEntries();
+        }
+      }
+
+      function displayEntries() {
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = "<h3>Entries:</h3>";
+        entries.forEach((entry, index) => {
+          resultDiv.innerHTML += `<p class="entry" onclick="editEntry(${index})">${
+            entry.name
+          }: ₹${entry.amount.toFixed(2)}</p>`;
+        });
+      }
+
+      function editEntry(index) {
+        const newAmount = prompt(
+          `Enter new amount for ${entries[index].name}:`,
+          entries[index].amount
+        );
+        if (newAmount !== null && !isNaN(parseFloat(newAmount))) {
+          entries[index].amount = parseFloat(newAmount);
+          displayEntries();
+        }
+      }
+
+      function calculateBalance() {
+        const totalAmount = entries.reduce(
+          (sum, entry) => sum + entry.amount,
+          0
+        );
+        const averageAmount = totalAmount / entries.length;
+        const balances = entries.map((entry) => ({
+          name: entry.name,
+          balance: entry.amount - averageAmount,
+        }));
+
+        displayBalances(balances);
+      }
+
+      function displayBalances(balances) {
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML += "<h3>Balances:</h3>";
+        balances.forEach((balance) => {
+          resultDiv.innerHTML += `<p>${
+            balance.name
+          }: ₹${balance.balance.toFixed(2)}</p>`;
+        });
+
+        const positiveBalances = balances.filter((b) => b.balance > 0);
+        const negativeBalances = balances.filter((b) => b.balance < 0);
+
+        resultDiv.innerHTML += "<h3>Payments:</h3>";
+        positiveBalances.forEach((p) => {
+          negativeBalances.forEach((n) => {
+            if (n.balance < 0) {
+              const payment = Math.min(p.balance, -n.balance);
+              resultDiv.innerHTML += `<p>${n.name} pays ${
+                p.name
+              } ₹${payment.toFixed(2)}</p>`;
+              p.balance -= payment;
+              n.balance += payment;
+            }
+          });
+        });
+      }
+    </script>
+  </body>
+</html>
