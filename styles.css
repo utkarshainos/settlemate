@@ -1,0 +1,55 @@
+body {
+  font-family: "Montserrat", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  background: linear-gradient(
+    135deg,
+    #ffecd2,
+    #fcb69f
+  ); /* Gradient background of #93a5cf and #e4efe9 */
+  padding: 20px;
+}
+
+.app-title {
+  font-family: "Rock Salt", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+.container {
+  max-width: 800px;
+  margin: auto;
+}
+
+.card {
+  margin-bottom: 20px;
+  background: rgba(255, 255, 255, 0.1); /* Translucent background */
+  border: 1px solid rgba(255, 255, 255, 0.2); /* Light border for better visibility */
+  backdrop-filter: blur(15px); /* Blur effect */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for a floating effect */
+  border-radius: 0; /* No curved edges */
+  padding: 20px; /* Padding inside the card */
+}
+
+.section-title {
+  font-weight: bold;
+  color: #007bff;
+}
+
+.edit-icon,
+.delete-icon {
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.edit-icon {
+  color: blue;
+}
+
+.delete-icon {
+  color: red;
+}
+
+.hidden {
+  display: none;
+}
