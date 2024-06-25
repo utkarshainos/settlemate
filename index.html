@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Split Payment</title>
+    <title>Settlemate</title>
     <link
       href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
       rel="stylesheet"
@@ -23,7 +23,7 @@
   </head>
   <body>
     <div class="container">
-      <h1 class="text-center mb-4 app-title">Splitwise</h1>
+      <h1 class="text-center mb-4 app-title">Settlemate</h1>
 
       <div class="card">
         <div class="card-header section-title">Add Participant</div>
@@ -77,7 +77,18 @@
           <div id="balance-result"></div>
         </div>
       </div>
+
+      <div class="card">
+        <div class="card-header section-title">Share Summary</div>
+        <div class="card-body">
+          <button class="btn btn-secondary mb-3" onclick="shareOnWhatsApp()">
+            Share on WhatsApp
+          </button>
+          <div id="balance-result"></div>
+        </div>
+      </div>
     </div>
+
     <script src="script.js"></script>
   </body>
 </html>

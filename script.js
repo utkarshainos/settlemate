@@ -197,3 +197,60 @@ function calculateBalance() {
     });
   });
 }
+
+function shareOnWhatsApp() {
+  let paymentsText = "*Payments:*\n";
+  payments.forEach((payment) => {
+    const participantNames = payment.selectedParticipants
+      .map((i) => `*${participants[i]}*`)
+      .join(", ");
+    paymentsText += `*${participants[payment.payer]}* paid for *${
+      payment.paymentType
+    }*: *₹${payment.paymentAmount.toFixed(
+      2
+    )}* and is split among ${participantNames}\n`;
+  });
+
+  let balancesText = "*Balances:*\n";
+  const balances = participants.map(() => 0);
+  payments.forEach((payment) => {
+    const amountPerPerson =
+      payment.paymentAmount / payment.selectedParticipants.length;
+    payment.selectedParticipants.forEach((index) => {
+      balances[index] -= amountPerPerson;
+    });
+    balances[payment.payer] += payment.paymentAmount;
+  });
+
+  participants.forEach((participant, index) => {
+    balancesText += `*${participant}*: *₹${balances[index].toFixed(2)}*\n`;
+  });
+
+  const positiveBalances = [];
+  const negativeBalances = [];
+  participants.forEach((participant, index) => {
+    if (balances[index] > 0) {
+      positiveBalances.push({ name: participant, balance: balances[index] });
+    } else if (balances[index] < 0) {
+      negativeBalances.push({ name: participant, balance: balances[index] });
+    }
+  });
+
+  let settlementsText = "\n*Settlements:*\n";
+  positiveBalances.forEach((p) => {
+    negativeBalances.forEach((n) => {
+      if (n.balance < 0) {
+        const payment = Math.min(p.balance, -n.balance);
+        settlementsText += `*${n.name}* owes *${p.name}* *₹${payment.toFixed(
+          2
+        )}*\n`;
+        p.balance -= payment;
+        n.balance += payment;
+      }
+    });
+  });
+
+  let finalText = `${paymentsText}\n${balancesText}\n${settlementsText}\nSimplify settlements with Settlemate https://utkarshainos.github.io/splitwise`;
+  const url = `https://wa.me/?text=${encodeURIComponent(finalText)}`;
+  window.open(url, "_blank");
+}
