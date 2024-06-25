@@ -250,7 +250,7 @@ function shareOnWhatsApp() {
     });
   });
 
-  let finalText = `${paymentsText}\n${balancesText}\n${settlementsText}\nSimplify settlements with Settlemate https://utkarshainos.github.io/splitwise`;
+  let finalText = `${paymentsText}\n${balancesText}\n${settlementsText}\nSimplify settlements with Settlemate https://utkarshainos.github.io/settlemate`;
   const url = `https://wa.me/?text=${encodeURIComponent(finalText)}`;
   window.open(url, "_blank");
 }

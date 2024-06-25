@@ -1,6 +1,6 @@
-# SettleMate
+# Settlemate
 
-SettleMate is a simple and intuitive application for splitting payments and managing balances among participants. It allows users to add participants, record payments, calculate balances, and share the results via WhatsApp.
+Settlemate is a simple and intuitive application for splitting payments and managing balances among participants. It allows users to add participants, record payments, calculate balances, and share the results via WhatsApp.
 
 ## Features
 
