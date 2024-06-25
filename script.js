@@ -286,12 +286,17 @@ function shareOnWhatsApp() {
   let balancesText = "*Balances:*\n";
   const balances = participants.map(() => 0);
   payments.forEach((payment) => {
-    const amountPerPerson = payment.splitAmounts
-      ? payment.splitAmounts
-      : payment.paymentAmount / payment.selectedParticipants.length;
-    payment.selectedParticipants.forEach((index, i) => {
-      balances[index] -= amountPerPerson[i];
-    });
+    if (payment.splitAmounts) {
+      payment.splitAmounts.forEach((amount, i) => {
+        balances[payment.selectedParticipants[i]] -= amount;
+      });
+    } else {
+      const amountPerPerson =
+        payment.paymentAmount / payment.selectedParticipants.length;
+      payment.selectedParticipants.forEach((index) => {
+        balances[index] -= amountPerPerson;
+      });
+    }
     balances[payment.payer] += payment.paymentAmount;
   });
 
